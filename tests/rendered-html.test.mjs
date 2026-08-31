@@ -46,3 +46,17 @@ test("includes finished social metadata and removes starter artifacts", async ()
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
   await access(new URL("../public/og.png", import.meta.url));
 });
+
+test("ships a self-contained GitHub Pages entry point", async () => {
+  const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(index, /<html lang="ja">/i);
+  assert.match(index, /<link rel="stylesheet" href="\.\/app\/globals\.css">/i);
+  assert.match(index, /https:\/\/adachitoon\.github\.io\/my-first-lp\//i);
+  assert.match(index, /id="stay"/);
+  assert.match(index, /id="access"/);
+  assert.match(index, /id="reserve"/);
+  assert.doesNotMatch(index, /className=|<\w+\s*\/>/);
+  assert.doesNotMatch(css, /@import\s+["']tailwindcss["']/);
+});
